@@ -1,6 +1,6 @@
 const {Router} = require("express");
 const courseRouter = Router();
-const auth = require("../middleware/auth");
+const auth = require("../../middleware/auth");
 
 courseRouter.get("/", auth, (req, res) => {
     res.send("Courses");
