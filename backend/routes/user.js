@@ -3,14 +3,14 @@ const bcrypt = require("bcrypt");
 const { z } = require("zod");
 const mongoose = require("mongoose");
 require("dotenv").config();
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET_USER;
 const {Router} = require("express");
-const authRouter = Router();
+const userRouter = Router();
 
 const { UserModel, CourseModel } = require("../db");
 
 
-authRouter.post("/signup", async function (req, res) {
+userRouter.post("/signup", async function (req, res) {
     const requireBody = z.object({
         firstname: z.string().min(3).max(100),
         lastname: z.string().min(3).max(100),
@@ -50,7 +50,7 @@ authRouter.post("/signup", async function (req, res) {
 
 })
 
-authRouter.post("/login", async function (req, res) {
+userRouter.post("/login", async function (req, res) {
     const requireBody = z.object({
         email: z.string().min(5).max(100).email(),
         pass: z.string().min(6)
@@ -94,5 +94,5 @@ authRouter.post("/login", async function (req, res) {
     }
 })
 module.exports={
-    authRouter: authRouter
+    userRouter: userRouter
 }

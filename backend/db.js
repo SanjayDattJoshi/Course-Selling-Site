@@ -7,7 +7,7 @@ mongoose.connect(process.env.MONGO_URI)
 
     
 const Schema = mongoose.Schema;
-const ObjectID = mongoose.Types.ObjectId;
+const ObjectID = mongoose.Schema.Types.ObjectId;
 
 const users = new Schema({
     firstname: String,
@@ -17,7 +17,6 @@ const users = new Schema({
 })
 
 const admin = new Schema({
-    adminid: ObjectID,
     email: {type:String, unique:true},
     pass: String,
     firstname: String,
@@ -25,18 +24,25 @@ const admin = new Schema({
 })
 
 const courses = new Schema({
-    courseid: ObjectID,
     title: String,
     description: String,
     price: Number,
     imageUrl: String,
-    creatorid: ObjectID
+    creatorid: {
+        type: ObjectID,
+        ref: "Admin"
+    }
 })
 
 const purchases = new Schema({
-    id: ObjectID,
-    courseid: ObjectID,
-    userid: ObjectID
+    courseid: {
+        type: ObjectID,
+        ref: "Course"
+    },
+    userid: {
+        type : ObjectID,
+        ref: "User"
+    }
 })
 
 const UserModel = mongoose.model('User', users, 'users');

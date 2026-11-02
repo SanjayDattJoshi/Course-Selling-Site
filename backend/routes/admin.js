@@ -3,15 +3,16 @@ const bcrypt = require("bcrypt");
 const { z } = require("zod");
 const mongoose = require("mongoose");
 require("dotenv").config();
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET_ADMIN;
 const {Router} = require("express");
 const adminRouter = Router();
 
+const adminAuth = require("../middleware/adminAuth");
 
-const { UserModel, CourseModel } = require("../db");
+const { AdminModel, CourseModel} = require("../db");
 
 
-authRouter.post("/signup", async function (req, res) {
+adminRouter.post("/signup", async function (req, res) {
     const requireBody = z.object({
         firstname: z.string().min(3).max(100),
         lastname: z.string().min(3).max(100),
@@ -33,12 +34,12 @@ authRouter.post("/signup", async function (req, res) {
     try {
         const hashedPass = await bcrypt.hash(pass, 10);
 
-        const user = await UserModel.findOne({
+        const user = await AdminModel.findOne({
             email: email
         })
         if (user) return res.status(409).json({ message: "Email Already Exists" });
 
-        await UserModel.insertOne({
+        await AdminModel.insertOne({
             firstname: firstname,
             lastname: lastname,
             email: email,
@@ -51,7 +52,7 @@ authRouter.post("/signup", async function (req, res) {
 
 })
 
-authRouter.post("/login", async function (req, res) {
+adminRouter.post("/login", async function (req, res) {
     const requireBody = z.object({
         email: z.string().min(5).max(100).email(),
         pass: z.string().min(6)
@@ -69,7 +70,7 @@ authRouter.post("/login", async function (req, res) {
     const { email, pass } = req.body;
 
     try {
-        const user = await UserModel.findOne({
+        const user = await AdminModel.findOne({
             email: email,
         })
 
@@ -95,20 +96,18 @@ authRouter.post("/login", async function (req, res) {
     }
 })
 
-adminRouter.use(adminMiddleware);
+adminRouter.use(adminAuth);
 
 adminRouter.post("/course", async function(req,res){
-    const adminID = req.userId;
-
     const {title,description,price,imageurl,creatorId} = req.body;
-
-    const course = await courseModel.create({
+    const course = await CourseModel.create({
         title,
         description,
         price,
         imageurl,
         creatorId
     })
+    res.json({message:"Added new course"});
 })
 
 adminRouter.put("/course", (req,res)=>{
@@ -122,6 +121,7 @@ adminRouter.get("/course",(req,res)=>{
 adminRouter.delete("/course", (req,res)=>{
     res.json({message:"delete course"});
 })
+
 module.exports={
     adminRouter: adminRouter
 }
